@@ -10,10 +10,12 @@ public class Raum : MonoBehaviour
     GameObject wall1;
     GameObject wall2;
     GameObject image;
+    GameObject partitionWall;
 
     Mesh meshWall;
     Mesh meshWall2;
     Mesh meshImage;
+    Mesh meshPartitionWall;
     List<Vector3> verticeswall = new List<Vector3>();
     List<Vector3> normalswall = new List<Vector3>();
     List<Vector2> uvwall = new List<Vector2>();
@@ -26,12 +28,17 @@ public class Raum : MonoBehaviour
     List<int> trianglesImage = new List<int>();
     List<Vector3> normalsImage = new List<Vector3>();
     List<Vector2> uvImage = new List<Vector2>();
+    List<Vector3> verticespartition = new List<Vector3>();
+    List<Vector3> normalspartition = new List<Vector3>();
+    List<Vector2> uvpartition = new List<Vector2>();
+    List<int> trianglespartition = new List<int>();
     
     public Material farbeFloor;
     public Material farbeRoof;
     public Material farbeCeiling;
     public Material farbeWall;
     public Material farbeWall2;
+    public Material farbePartitionWall;
 
     Vector3 normal1;
     Vector3 normal2;
@@ -41,11 +48,19 @@ public class Raum : MonoBehaviour
     Vector3 normal6;
     Vector3 normal7;
     Vector3 normal8;
+    Vector3 normal9;
+    Vector3 normal10;
+    Vector3 normal11;
+    Vector3 normal12;
+    Vector3 normal13;
+    Vector3 normal14;
+    Vector3 normal15;
+    Vector3 normal16;
 
     float size;
     float s;
-    float place;
-    float height = 10.0f;
+    int place;
+    float height = 15.0f;
 
     int i = 0;
     public int podestHeight = 3;
@@ -55,9 +70,9 @@ public class Raum : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        s = rand.Next(2,4);
+        s = 5;
         size = s * 5.0f; 
-        //place = rand.Next(-size+(2*s), size-(2*s));
+        place = rand.Next(Mathf.RoundToInt((int)-size+(4*s)), Mathf.RoundToInt((int)size-(4*s)));
 
         //Boden
         floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -136,6 +151,29 @@ public class Raum : MonoBehaviour
         //rendWall2.material = farbeWall2;
 
         createArtObj();
+
+        //Trennwände
+        partitionWall = new GameObject();
+        partitionWall.name = "Trennwände";
+        partitionWall.AddComponent<MeshFilter>();
+        partitionWall.AddComponent<MeshRenderer>();
+
+        makepartitions(size, place);
+
+        meshPartitionWall = new Mesh();
+        partitionWall.GetComponent<MeshFilter>().mesh = meshPartitionWall;
+        meshPartitionWall.RecalculateNormals();
+
+        meshPartitionWall.vertices = verticespartition.ToArray();
+        meshPartitionWall.triangles = trianglespartition.ToArray();
+        meshPartitionWall.normals = normalspartition.ToArray();
+        meshPartitionWall.uv = uvpartition.ToArray();
+
+        Renderer rendPartition = partitionWall.GetComponent<MeshRenderer>();
+        rendPartition.material = new Material(Shader.Find("Specular"));
+        Texture partitionTexture = Resources.Load("tapete.jpg") as Texture;
+        rendPartition.material.mainTexture = partitionTexture;
+        //rendWall2.material = farbeWall2;
     }
 
     /*************** CREATE ART OBJECTS **********************/
@@ -184,7 +222,7 @@ public class Raum : MonoBehaviour
 
     }
 
-        void createGallery(int x, int z){
+        void createGallery(float x, int z){
         Vector3 a = new Vector3(x,2,z);
         Vector3 b = new Vector3(x,2+1,z);
         Vector3 c = new Vector3(x+1,2,z);
@@ -227,10 +265,10 @@ public class Raum : MonoBehaviour
         Vector3 c = new Vector3(-size, 0, -size);//2
         Vector3 d = new Vector3(-size, 0, size);//3
 
-        Vector3 e = new Vector3(size, 10, size);//4
-        Vector3 f = new Vector3(size, 10, -size);//5
-        Vector3 g = new Vector3(-size, 10, -size);//6
-        Vector3 h = new Vector3(-size, 10, size);//7
+        Vector3 e = new Vector3(size, height, size);//4
+        Vector3 f = new Vector3(size, height, -size);//5
+        Vector3 g = new Vector3(-size, height, -size);//6
+        Vector3 h = new Vector3(-size, height, size);//7
 
         verticeswall.Add(a);
         verticeswall.Add(b);
@@ -277,10 +315,10 @@ public class Raum : MonoBehaviour
         Vector3 c = new Vector3(-size, 0, -size);//2
         Vector3 d = new Vector3(-size, 0, size);//3
 
-        Vector3 e = new Vector3(size, 10, size);//4
-        Vector3 f = new Vector3(size, 10, -size);//5
-        Vector3 g = new Vector3(-size, 10, -size);//6
-        Vector3 h = new Vector3(-size, 10, size);//7
+        Vector3 e = new Vector3(size, height, size);//4
+        Vector3 f = new Vector3(size, height, -size);//5
+        Vector3 g = new Vector3(-size, height, -size);//6
+        Vector3 h = new Vector3(-size, height, size);//7
 
         verticeswall2.Add(a);
         verticeswall2.Add(b);
@@ -389,6 +427,138 @@ public class Raum : MonoBehaviour
         triangleswall2.Add(4);
     }
 
+    public void makepartitions(float size, float place){
+        //Wand 1
+        Vector3 a = new Vector3(place, 0, size);//0
+        Vector3 b = new Vector3(place, 0, size - 8);//1
+        Vector3 c = new Vector3(place, height, size);//2
+        Vector3 d = new Vector3(place, height, size - 8);//3
+
+        //Wand 2
+        Vector3 e = new Vector3(place, 0, -size);//4
+        Vector3 f = new Vector3(place, 0, -size + 8);//5
+        Vector3 g = new Vector3(place, height, -size);//6
+        Vector3 h = new Vector3(place, height, -size + 8);//7
+
+        //Wand 3
+        Vector3 i = new Vector3(size, 0, place);//4
+        Vector3 j = new Vector3(size - 8, 0, place);//5
+        Vector3 k = new Vector3(size, height, place);//6
+        Vector3 l = new Vector3(size - 8, height, place);//7
+
+        //Wand 4
+        Vector3 m = new Vector3(-size, 0, place);//4
+        Vector3 n = new Vector3(-size + 8, 0, place);//5
+        Vector3 o = new Vector3(-size, height, place);//6
+        Vector3 p = new Vector3(-size + 8, height, place);//7
+
+        verticespartition.Add(a);
+        verticespartition.Add(b);
+        verticespartition.Add(c);
+        verticespartition.Add(d);
+        verticespartition.Add(e);
+        verticespartition.Add(f);
+        verticespartition.Add(g);
+        verticespartition.Add(h);
+        verticespartition.Add(i);
+        verticespartition.Add(j);
+        verticespartition.Add(k);
+        verticespartition.Add(l);
+        verticespartition.Add(m);
+        verticespartition.Add(n);
+        verticespartition.Add(o);
+        verticespartition.Add(p);
+
+        normal1 = getNormal(a, c, b); normalspartition.Add(normal1);
+        normal2 = getNormal(b, d, a); normalspartition.Add(normal2);
+        normal3 = getNormal(c, a, d); normalspartition.Add(normal3);
+        normal4 = getNormal(d, b, c); normalspartition.Add(normal4);
+        normal5 = getNormal(e, g, f); normalspartition.Add(normal5);
+        normal6 = getNormal(f, h, e); normalspartition.Add(normal6);
+        normal7 = getNormal(g, e, h); normalspartition.Add(normal7);
+        normal8 = getNormal(h, f, g); normalspartition.Add(normal8);
+        normal9 = getNormal(i, k, j); normalspartition.Add(normal9);
+        normal10 = getNormal(j, l, i); normalspartition.Add(normal10);
+        normal11 = getNormal(k, i, l); normalspartition.Add(normal11);
+        normal12 = getNormal(l, j, k); normalspartition.Add(normal12);
+        normal13 = getNormal(m, o, n); normalspartition.Add(normal13);
+        normal14 = getNormal(n, p, m); normalspartition.Add(normal14);
+        normal15 = getNormal(o, m, p); normalspartition.Add(normal15);
+        normal16 = getNormal(p, n, o); normalspartition.Add(normal16);
+
+        uvwall2.Add(new Vector2(0,0));
+        uvwall2.Add(new Vector2(1,0));
+        uvwall2.Add(new Vector2(0,1));
+        uvwall2.Add(new Vector2(1,1));
+        uvwall2.Add(new Vector2(0,0));
+        uvwall2.Add(new Vector2(1,0));
+        uvwall2.Add(new Vector2(1,1));
+        uvwall2.Add(new Vector2(0,1));
+
+        makepartitiontriangles();
+    }
+
+    public void makepartitiontriangles(){
+        //left
+        trianglespartition.Add(0);
+        trianglespartition.Add(3);
+        trianglespartition.Add(1);
+        trianglespartition.Add(0);
+        trianglespartition.Add(2);
+        trianglespartition.Add(3);
+
+        trianglespartition.Add(0);
+        trianglespartition.Add(1);
+        trianglespartition.Add(3);
+        trianglespartition.Add(0);
+        trianglespartition.Add(3);
+        trianglespartition.Add(2);
+
+        //front
+        trianglespartition.Add(4);
+        trianglespartition.Add(6);
+        trianglespartition.Add(5);
+        trianglespartition.Add(5);
+        trianglespartition.Add(6);
+        trianglespartition.Add(7);
+
+        trianglespartition.Add(4);
+        trianglespartition.Add(5);
+        trianglespartition.Add(6);
+        trianglespartition.Add(5);
+        trianglespartition.Add(7);
+        trianglespartition.Add(6);
+
+        //right
+        trianglespartition.Add(8);
+        trianglespartition.Add(9);
+        trianglespartition.Add(10);
+        trianglespartition.Add(9);
+        trianglespartition.Add(11);
+        trianglespartition.Add(10);
+
+        trianglespartition.Add(8);
+        trianglespartition.Add(10);
+        trianglespartition.Add(9);
+        trianglespartition.Add(9);
+        trianglespartition.Add(10);
+        trianglespartition.Add(11);
+
+        //back
+        trianglespartition.Add(12);
+        trianglespartition.Add(13);
+        trianglespartition.Add(14);
+        trianglespartition.Add(13);
+        trianglespartition.Add(15);
+        trianglespartition.Add(14);
+
+        trianglespartition.Add(12);
+        trianglespartition.Add(14);
+        trianglespartition.Add(13);
+        trianglespartition.Add(13);
+        trianglespartition.Add(14);
+        trianglespartition.Add(15);
+    }
     // Update is called once per frame
     void Update()
     {
